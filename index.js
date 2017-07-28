@@ -30,10 +30,14 @@ exports.decorateConfig = (config) => {
         dirtyColor: configColors.lightYellow,
         aheadColor: configColors.blue,
         fontSize: 12,
-        enableKubebertes: true
+        enableKubebertes: true,
+        kubenertesPath: '/usr/local/bin/kubectl'
     }, config.hyperStatusLine);
 
+
+
     return Object.assign({}, config, {
+        hyperStatusLine: hyperStatusLine,
         css: `
             ${config.css || ''}
             .terms_terms {
@@ -269,8 +273,10 @@ const setGit = (repo) => {
 }
 
 const setKube = (repo) => {
-    exec(`/usr/local/bin/kubectl config current-context`, (err, stdout) => {
-        console.log('KUBE', err, stdout)
+    const conf = config.getConfig().hyperStatusLine;
+    if (!conf.enableKubebertes) return;
+
+    exec(`${conf.kubenertesPath} config current-context`, (err, stdout) => {
         if (!err) {
             kube = stdout.trim();
         }
